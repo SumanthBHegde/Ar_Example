@@ -1,40 +1,43 @@
-import React, { useRef, useEffect } from "react";
+import React, { useCallback, useState } from "react";
 import { Canvas } from "@react-three/fiber";
 import { ARButton, XR } from "@react-three/xr";
-
 import XrModels from "./XrModels";
 import ModelSelector from "../dom/ModelSelector";
 import { ModelProvider } from "../contexts/ModelContext";
 
 const XrModelContainersMain = () => {
-  // Create a ref for the XR container
-  const xrContainerRef = useRef(null);
+  const [overlayContent, setOverlayContent] = useState(null);
 
-  useEffect(() => {
-    if (xrContainerRef.current) {
-      // Debugging: log to check if the ref is assigned correctly
-      console.log("XR container is set: ", xrContainerRef.current);
+  // Set the DOM overlay reference
+  const interfaceRef = useCallback((node) => {
+    if (node !== null) {
+      setOverlayContent(node);
     }
-  }, [xrContainerRef]);
+  }, []);
 
   return (
     <ModelProvider>
-      {/* Assign the ref to the container */}
-      <div className="xr-container" ref={xrContainerRef}>
+      {/* Model Selector as DOM Overlay */}
+      <div ref={interfaceRef}>
         <ModelSelector />
-        <ARButton
-          sessionInit={{
-            requiredFeatures: ["hit-test"],
-            optionalFeatures: ["dom-overlay"],
-            domOverlay: { root: xrContainerRef.current }, // Use the ref here
-          }}
-        />
-        <Canvas>
-          <XR>
-            <XrModels />
-          </XR>
-        </Canvas>
       </div>
+
+      {/* ARButton with domOverlay configuration */}
+      <ARButton
+        sessionInit={{
+          requiredFeatures: ["hit-test"],
+          optionalFeatures: ["dom-overlay"],
+          domOverlay: { root: overlayContent },
+        }}
+        className="ar-button"
+      />
+
+      {/* 3D Canvas */}
+      <Canvas>
+        <XR>
+          <XrModels />
+        </XR>
+      </Canvas>
     </ModelProvider>
   );
 };

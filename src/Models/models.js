@@ -12,3 +12,5 @@ export const models = [
     path: "/models/Nandi/scene.gltf",
   },
 ];
+
+//adding the scale factor so that each each objects scales beautifully
